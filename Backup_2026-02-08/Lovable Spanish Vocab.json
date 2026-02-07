@@ -1,0 +1,918 @@
+{
+  "updatedAt": "2026-01-17T12:18:59.874Z",
+  "createdAt": "2026-01-13T13:06:47.406Z",
+  "id": "TfIXmZUCBcIo-AdNjRlIH",
+  "name": "Lovable Spanish Vocab",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg",
+          "mode": "list",
+          "cachedResultName": "Spanish Vocabulary",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 950039728,
+          "mode": "list",
+          "cachedResultName": "Spanish Vocabulary - Vocabulary_CLEANED_GROUPED",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg/edit#gid=950039728"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d5c1b8b9-2f89-44dc-a44b-395c91b17d4d",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "RAsnDxfXve6rzTvR",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "03fc3f3e-a43f-4e66-b917-ae3abff84f46",
+      "name": "Format response in json"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg",
+          "mode": "list",
+          "cachedResultName": "Spanish Vocabulary",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 950039728,
+          "mode": "list",
+          "cachedResultName": "Spanish Vocabulary - Vocabulary_CLEANED_GROUPED",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg/edit#gid=950039728"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.row_number }}",
+            "known": "={{ $json.known }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "spanish",
+              "displayName": "spanish",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "english",
+              "displayName": "english",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "usage",
+              "displayName": "usage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "known",
+              "displayName": "known",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "learned",
+              "displayName": "learned",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        384,
+        224
+      ],
+      "id": "334a545c-e337-4e97-a973-511af72bcc2b",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "RAsnDxfXve6rzTvR",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Update Known').first().json.body"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        224
+      ],
+      "id": "ee594d88-20f9-421e-9c2c-6a08514c489b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg",
+          "mode": "list",
+          "cachedResultName": "Spanish Vocabulary",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 950039728,
+          "mode": "list",
+          "cachedResultName": "Spanish Vocabulary - Vocabulary_CLEANED_GROUPED",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg/edit#gid=950039728"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.row_number }}",
+            "learned": "{{ $json.learned }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "spanish",
+              "displayName": "spanish",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "english",
+              "displayName": "english",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "usage",
+              "displayName": "usage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "known",
+              "displayName": "known",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "learned",
+              "displayName": "learned",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        400,
+        448
+      ],
+      "id": "86f7a1d7-f489-4597-8640-62be59bf968f",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "RAsnDxfXve6rzTvR",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Update Learned').first().json.body"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        448
+      ],
+      "id": "b58f35a7-b5bd-447a-81ad-9ba9cf520da7",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "path": "vocabulary/spanish",
+        "authentication": "basicAuth",
+        "responseMode": "lastNode",
+        "responseData": "allEntries",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "28fda4fd-00e3-4c3e-ad40-303fb7c54e10",
+      "name": "GET flashcards",
+      "webhookId": "692f6110-fd3d-4bb3-80ee-9ccd08a9ebc0",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "gCTSYu1MbzM3sS0I",
+          "name": "Spanish Buddy creds"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/vocabulary/spanish/update",
+        "authentication": "basicAuth",
+        "responseMode": "lastNode",
+        "responseData": "allEntries",
+        "options": {
+          "allowedOrigins": "https://spanish-word-buddy.vercel.app, http://localhost:8080/"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        224
+      ],
+      "id": "e58a8bb8-845f-418f-a8ee-4e877f425f5c",
+      "name": "Update Known",
+      "webhookId": "692f6110-fd3d-4bb3-80ee-9ccd08a9ebc0",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "gCTSYu1MbzM3sS0I",
+          "name": "Spanish Buddy creds"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/vocabulary/spanish/learned/update",
+        "authentication": "basicAuth",
+        "responseMode": "lastNode",
+        "responseData": "allEntries",
+        "options": {
+          "allowedOrigins": "https://spanish-word-buddy.vercel.app, http://localhost:8080/"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        16,
+        448
+      ],
+      "id": "998f39a1-b3c4-42c4-9e99-a07e34d9cb56",
+      "name": "Update Learned",
+      "webhookId": "692f6110-fd3d-4bb3-80ee-9ccd08a9ebc0",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "gCTSYu1MbzM3sS0I",
+          "name": "Spanish Buddy creds"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Format response in json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET flashcards": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Known": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Learned": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "78a7f7c8-f764-4c83-b16d-e08c49b72ba2",
+  "activeVersionId": "78a7f7c8-f764-4c83-b16d-e08c49b72ba2",
+  "triggerCount": 3,
+  "shared": [
+    {
+      "updatedAt": "2026-01-13T13:06:47.407Z",
+      "createdAt": "2026-01-13T13:06:47.407Z",
+      "role": "workflow:owner",
+      "workflowId": "TfIXmZUCBcIo-AdNjRlIH",
+      "projectId": "S9MAW5q8Q1rswQcB"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-01-17T12:19:13.000Z",
+    "createdAt": "2026-01-17T12:18:59.875Z",
+    "versionId": "78a7f7c8-f764-4c83-b16d-e08c49b72ba2",
+    "workflowId": "TfIXmZUCBcIo-AdNjRlIH",
+    "nodes": [
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg",
+            "mode": "list",
+            "cachedResultName": "Spanish Vocabulary",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 950039728,
+            "mode": "list",
+            "cachedResultName": "Spanish Vocabulary - Vocabulary_CLEANED_GROUPED",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg/edit#gid=950039728"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          208,
+          0
+        ],
+        "id": "d5c1b8b9-2f89-44dc-a44b-395c91b17d4d",
+        "name": "Get row(s) in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "RAsnDxfXve6rzTvR",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          416,
+          0
+        ],
+        "id": "03fc3f3e-a43f-4e66-b917-ae3abff84f46",
+        "name": "Format response in json"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg",
+            "mode": "list",
+            "cachedResultName": "Spanish Vocabulary",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 950039728,
+            "mode": "list",
+            "cachedResultName": "Spanish Vocabulary - Vocabulary_CLEANED_GROUPED",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg/edit#gid=950039728"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "row_number": "={{ $json.row_number }}",
+              "known": "={{ $json.known }}"
+            },
+            "matchingColumns": [
+              "row_number"
+            ],
+            "schema": [
+              {
+                "id": "spanish",
+                "displayName": "spanish",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "english",
+                "displayName": "english",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "usage",
+                "displayName": "usage",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "known",
+                "displayName": "known",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "learned",
+                "displayName": "learned",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          384,
+          224
+        ],
+        "id": "334a545c-e337-4e97-a973-511af72bcc2b",
+        "name": "Update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "RAsnDxfXve6rzTvR",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "return $('Update Known').first().json.body"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          208,
+          224
+        ],
+        "id": "ee594d88-20f9-421e-9c2c-6a08514c489b",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg",
+            "mode": "list",
+            "cachedResultName": "Spanish Vocabulary",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 950039728,
+            "mode": "list",
+            "cachedResultName": "Spanish Vocabulary - Vocabulary_CLEANED_GROUPED",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1i0N9SQZZqXv-xD_YRkfGTLr9s6lbjiyZqyem5nc8dMg/edit#gid=950039728"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "row_number": "={{ $json.row_number }}",
+              "learned": "{{ $json.learned }}"
+            },
+            "matchingColumns": [
+              "row_number"
+            ],
+            "schema": [
+              {
+                "id": "spanish",
+                "displayName": "spanish",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "english",
+                "displayName": "english",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "usage",
+                "displayName": "usage",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "known",
+                "displayName": "known",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "learned",
+                "displayName": "learned",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          400,
+          448
+        ],
+        "id": "86f7a1d7-f489-4597-8640-62be59bf968f",
+        "name": "Update row in sheet1",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "RAsnDxfXve6rzTvR",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "return $('Update Learned').first().json.body"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          208,
+          448
+        ],
+        "id": "b58f35a7-b5bd-447a-81ad-9ba9cf520da7",
+        "name": "Code in JavaScript1"
+      },
+      {
+        "parameters": {
+          "path": "vocabulary/spanish",
+          "authentication": "basicAuth",
+          "responseMode": "lastNode",
+          "responseData": "allEntries",
+          "options": {
+            "allowedOrigins": "*"
+          }
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "28fda4fd-00e3-4c3e-ad40-303fb7c54e10",
+        "name": "GET flashcards",
+        "webhookId": "692f6110-fd3d-4bb3-80ee-9ccd08a9ebc0",
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "gCTSYu1MbzM3sS0I",
+            "name": "Spanish Buddy creds"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "/vocabulary/spanish/update",
+          "authentication": "basicAuth",
+          "responseMode": "lastNode",
+          "responseData": "allEntries",
+          "options": {
+            "allowedOrigins": "https://spanish-word-buddy.vercel.app, http://localhost:8080/"
+          }
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          224
+        ],
+        "id": "e58a8bb8-845f-418f-a8ee-4e877f425f5c",
+        "name": "Update Known",
+        "webhookId": "692f6110-fd3d-4bb3-80ee-9ccd08a9ebc0",
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "gCTSYu1MbzM3sS0I",
+            "name": "Spanish Buddy creds"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "/vocabulary/spanish/learned/update",
+          "authentication": "basicAuth",
+          "responseMode": "lastNode",
+          "responseData": "allEntries",
+          "options": {
+            "allowedOrigins": "https://spanish-word-buddy.vercel.app, http://localhost:8080/"
+          }
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          16,
+          448
+        ],
+        "id": "998f39a1-b3c4-42c4-9e99-a07e34d9cb56",
+        "name": "Update Learned",
+        "webhookId": "692f6110-fd3d-4bb3-80ee-9ccd08a9ebc0",
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "gCTSYu1MbzM3sS0I",
+            "name": "Spanish Buddy creds"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Get row(s) in sheet": {
+        "main": [
+          [
+            {
+              "node": "Format response in json",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "Update row in sheet1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "GET flashcards": {
+        "main": [
+          [
+            {
+              "node": "Get row(s) in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update Known": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update Learned": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Rishabh Saha",
+    "name": "Version 78a7f7c8",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
