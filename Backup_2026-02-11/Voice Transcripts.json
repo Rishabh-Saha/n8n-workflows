@@ -1,0 +1,218 @@
+{
+  "updatedAt": "2026-01-15T02:58:46.078Z",
+  "createdAt": "2026-01-15T00:45:55.238Z",
+  "id": "68Ph0qWujISxId2ky465w",
+  "name": "Voice Transcripts",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -720,
+        -240
+      ],
+      "id": "e2739a1d-c93c-41c1-ab38-596a73d7d1bf",
+      "name": "Telegram Trigger",
+      "webhookId": "6a902b94-9de4-4f6c-915a-9c2ba5aac0e9",
+      "credentials": {
+        "telegramApi": {
+          "id": "aGXHchKpNa6jesHn",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "/doordash",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notExists",
+                      "singleValue": true
+                    },
+                    "id": "c730e484-7ace-42d8-ab83-cdacb20bac11"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e620c6f5-0624-49e2-9354-dc4dc49e9084",
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "voice",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -480,
+        -240
+      ],
+      "id": "15f828d7-68d7-4989-8327-96a106180391",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        -128
+      ],
+      "id": "bdb78e35-7972-4c88-993f-192f89add056",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "WnKpEAlRef7JXEVa",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -256,
+        -128
+      ],
+      "id": "2a7705eb-791b-4030-baa7-9d4e6fb20364",
+      "name": "Get a file",
+      "webhookId": "e6ad22e6-95f2-4724-8a9d-a903983058aa",
+      "credentials": {
+        "telegramApi": {
+          "id": "aGXHchKpNa6jesHn",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Telegram Voice Notes",
+        "height": 368,
+        "width": 1008
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        -336
+      ],
+      "id": "0e3f1449-26e4-49c2-b399-e80a261915e7",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "17bc44b3-be47-4c30-ad1e-807ec262ba4d",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-01-15T00:45:55.245Z",
+      "createdAt": "2026-01-15T00:45:55.245Z",
+      "role": "workflow:owner",
+      "workflowId": "68Ph0qWujISxId2ky465w",
+      "projectId": "S9MAW5q8Q1rswQcB"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
