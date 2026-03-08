@@ -1,0 +1,449 @@
+{
+  "updatedAt": "2026-02-24T12:12:00.270Z",
+  "createdAt": "2026-02-24T11:53:45.811Z",
+  "id": "z535jZK2n55BPCvqsxvt3",
+  "name": "Crunchyroll New Episode -> Telegram",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {}
+          ]
+        }
+      },
+      "name": "Cron",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        0
+      ],
+      "id": "af05d063-d902-4886-91e3-05bcc6eb0c31"
+    },
+    {
+      "parameters": {
+        "url": "https://feeds.feedburner.com/crunchyroll/rss/anime?format=xml",
+        "options": {}
+      },
+      "name": "RSS Read",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "a38eb1ca-7005-4a0a-9b36-b7c340de977a"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "yYmaqYw2mLcEEmbm",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/yYmaqYw2mLcEEmbm",
+          "cachedResultName": "Telegram subworkflow message"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "text": "={{ $json.telegramText }}"
+          },
+          "matchingColumns": [
+            "text"
+          ],
+          "schema": [
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "6a140e24-6dc8-4ba3-bff6-599f41d85699",
+      "name": "Call 'Telegram subworkflow message'"
+    },
+    {
+      "parameters": {
+        "jsCode": "const favorites = $('Favorites').first().json.favorites;\n\nconst HOURS_LIMIT = 24;\nconst now = Date.now();\n\nfunction isFavorite(title) {\n  const t = (title || '').toLowerCase();\n  return favorites.some(f => t.includes(f.toLowerCase()));\n}\n\nfunction isEnglishVersion(title) {\n  const t = (title || '').toLowerCase();\n\n  // Allow English Dub\n  if (t.includes('english dub')) return true;\n\n  // Allow Sub\n  if (t.includes('(sub)') || t.includes('subbed')) return true;\n\n  // Allow default sub (no language specified, no foreign dub mentioned)\n  if (\n    !t.includes('dub') &&\n    !t.includes('spanish') &&\n    !t.includes('portuguese') &&\n    !t.includes('german') &&\n    !t.includes('french')\n  ) {\n    return true;\n  }\n\n  return false;\n}\n\nfunction isWithinLast24Hours(pubDate) {\n  if (!pubDate) return false;\n\n  const publishedTime = new Date(pubDate).getTime();\n  if (Number.isNaN(publishedTime)) return false;\n\n  const diffHours = (now - publishedTime) / (1000 * 60 * 60);\n  return diffHours <= HOURS_LIMIT;\n}\n\nreturn items.filter(item => {\n  const title = item.json.title || '';\n  const pubDate = item.json.pubDate;\n\n  return (\n    isFavorite(title) &&\n    isEnglishVersion(title) &&\n    isWithinLast24Hours(pubDate)\n  );\n});\n"
+      },
+      "name": "Filter for favourite animes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        0
+      ],
+      "id": "c41371e1-1b7d-472a-9854-19ad104fb321"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "guid",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "f15a7105-3193-4ab8-bdb9-ed51c2422804",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "jsCode": "if (items.length === 0) {\n  return [];\n}\n\nlet message = \"📺 New Anime Episodes Dropped!\\n\\n\";\n\nfor (const item of items) {\n  message += `• ${item.json.title}\\n`;\n  if (item.json.link) {\n    message += `  🔗 ${item.json.link}\\n`;\n  }\n  message += \"\\n\";\n}\n\nreturn [\n  {\n    json: {\n      telegramText: message\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        0
+      ],
+      "id": "505fa681-e352-4ba1-b2ee-a0e8186c6948",
+      "name": "Message for telegram"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  favorites: [\"One Piece\", \"Jujutsu Kaisen\", \"Freiren\"]\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        0
+      ],
+      "id": "f13c905f-1147-42e1-8817-416725e4abb4",
+      "name": "Favorites"
+    }
+  ],
+  "connections": {
+    "Cron": {
+      "main": [
+        [
+          {
+            "node": "Favorites",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Filter for favourite animes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter for favourite animes": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Telegram subworkflow message'": {
+      "main": [
+        []
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Message for telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message for telegram": {
+      "main": [
+        [
+          {
+            "node": "Call 'Telegram subworkflow message'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Favorites": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "rmDfCTWRzR57SKTP-X6hw"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "42e03f2b-01c9-4c3a-866e-a4d3f50e544b",
+  "activeVersionId": "42e03f2b-01c9-4c3a-866e-a4d3f50e544b",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-02-24T11:53:45.817Z",
+      "createdAt": "2026-02-24T11:53:45.817Z",
+      "role": "workflow:owner",
+      "workflowId": "z535jZK2n55BPCvqsxvt3",
+      "projectId": "S9MAW5q8Q1rswQcB"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-02-24T12:11:42.000Z",
+    "createdAt": "2026-02-24T12:11:40.765Z",
+    "versionId": "42e03f2b-01c9-4c3a-866e-a4d3f50e544b",
+    "workflowId": "z535jZK2n55BPCvqsxvt3",
+    "nodes": [
+      {
+        "parameters": {
+          "triggerTimes": {
+            "item": [
+              {}
+            ]
+          }
+        },
+        "name": "Cron",
+        "type": "n8n-nodes-base.cron",
+        "typeVersion": 1,
+        "position": [
+          -160,
+          0
+        ],
+        "id": "af05d063-d902-4886-91e3-05bcc6eb0c31"
+      },
+      {
+        "parameters": {
+          "url": "https://feeds.feedburner.com/crunchyroll/rss/anime?format=xml",
+          "options": {}
+        },
+        "name": "RSS Read",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1,
+        "position": [
+          224,
+          0
+        ],
+        "id": "a38eb1ca-7005-4a0a-9b36-b7c340de977a"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "yYmaqYw2mLcEEmbm",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/yYmaqYw2mLcEEmbm",
+            "cachedResultName": "Telegram subworkflow message"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "text": "={{ $json.telegramText }}"
+            },
+            "matchingColumns": [
+              "text"
+            ],
+            "schema": [
+              {
+                "id": "text",
+                "displayName": "text",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          1120,
+          0
+        ],
+        "id": "6a140e24-6dc8-4ba3-bff6-599f41d85699",
+        "name": "Call 'Telegram subworkflow message'"
+      },
+      {
+        "parameters": {
+          "jsCode": "const favorites = $('Favorites').first().json.favorites;\n\nconst HOURS_LIMIT = 24;\nconst now = Date.now();\n\nfunction isFavorite(title) {\n  const t = (title || '').toLowerCase();\n  return favorites.some(f => t.includes(f.toLowerCase()));\n}\n\nfunction isEnglishVersion(title) {\n  const t = (title || '').toLowerCase();\n\n  // Allow English Dub\n  if (t.includes('english dub')) return true;\n\n  // Allow Sub\n  if (t.includes('(sub)') || t.includes('subbed')) return true;\n\n  // Allow default sub (no language specified, no foreign dub mentioned)\n  if (\n    !t.includes('dub') &&\n    !t.includes('spanish') &&\n    !t.includes('portuguese') &&\n    !t.includes('german') &&\n    !t.includes('french')\n  ) {\n    return true;\n  }\n\n  return false;\n}\n\nfunction isWithinLast24Hours(pubDate) {\n  if (!pubDate) return false;\n\n  const publishedTime = new Date(pubDate).getTime();\n  if (Number.isNaN(publishedTime)) return false;\n\n  const diffHours = (now - publishedTime) / (1000 * 60 * 60);\n  return diffHours <= HOURS_LIMIT;\n}\n\nreturn items.filter(item => {\n  const title = item.json.title || '';\n  const pubDate = item.json.pubDate;\n\n  return (\n    isFavorite(title) &&\n    isEnglishVersion(title) &&\n    isWithinLast24Hours(pubDate)\n  );\n});\n"
+        },
+        "name": "Filter for favourite animes",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          464,
+          0
+        ],
+        "id": "c41371e1-1b7d-472a-9854-19ad104fb321"
+      },
+      {
+        "parameters": {
+          "compare": "selectedFields",
+          "fieldsToCompare": "guid",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.removeDuplicates",
+        "typeVersion": 2,
+        "position": [
+          672,
+          0
+        ],
+        "id": "f15a7105-3193-4ab8-bdb9-ed51c2422804",
+        "name": "Remove Duplicates"
+      },
+      {
+        "parameters": {
+          "jsCode": "if (items.length === 0) {\n  return [];\n}\n\nlet message = \"📺 New Anime Episodes Dropped!\\n\\n\";\n\nfor (const item of items) {\n  message += `• ${item.json.title}\\n`;\n  if (item.json.link) {\n    message += `  🔗 ${item.json.link}\\n`;\n  }\n  message += \"\\n\";\n}\n\nreturn [\n  {\n    json: {\n      telegramText: message\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          896,
+          0
+        ],
+        "id": "505fa681-e352-4ba1-b2ee-a0e8186c6948",
+        "name": "Message for telegram"
+      },
+      {
+        "parameters": {
+          "jsCode": "return {\n  favorites: [\"One Piece\", \"Jujutsu Kaisen\", \"Freiren\"]\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          32,
+          0
+        ],
+        "id": "f13c905f-1147-42e1-8817-416725e4abb4",
+        "name": "Favorites"
+      }
+    ],
+    "connections": {
+      "Cron": {
+        "main": [
+          [
+            {
+              "node": "Favorites",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RSS Read": {
+        "main": [
+          [
+            {
+              "node": "Filter for favourite animes",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter for favourite animes": {
+        "main": [
+          [
+            {
+              "node": "Remove Duplicates",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call 'Telegram subworkflow message'": {
+        "main": [
+          []
+        ]
+      },
+      "Remove Duplicates": {
+        "main": [
+          [
+            {
+              "node": "Message for telegram",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Message for telegram": {
+        "main": [
+          [
+            {
+              "node": "Call 'Telegram subworkflow message'",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Favorites": {
+        "main": [
+          [
+            {
+              "node": "RSS Read",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Rishabh Saha",
+    "name": "Version 42e03f2b",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
