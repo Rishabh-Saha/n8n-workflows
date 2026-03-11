@@ -1,0 +1,1299 @@
+{
+  "updatedAt": "2026-01-14T12:02:07.493Z",
+  "createdAt": "2026-01-13T13:06:22.867Z",
+  "id": "E5ubM3iW16uck4BR3hhLB",
+  "name": "LinkedIn Job Search + Auto-Match Resume with AI",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 17
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1312,
+        192
+      ],
+      "id": "dc1c97ae-44a9-403d-a8e1-7fe16a16f7b5",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "1WsWH0_c3S3UtESpRbxiL1SgfI6WFIM_j4i88y_AFG8Y"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        -432,
+        192
+      ],
+      "id": "6ba4e8c7-0702-4bdc-b3e5-1cf1883eb3a0",
+      "name": "Get resume",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "Xf0jjXdboN3IyTBx",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1VMD_zawm6keYOTm0xHzMQa-4dGDyVo5gEE0TrxSlu4g",
+          "mode": "list",
+          "cachedResultName": "Job Search",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VMD_zawm6keYOTm0xHzMQa-4dGDyVo5gEE0TrxSlu4g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Create Sheet Name').item.json.isoDate }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "link"
+          ],
+          "schema": [
+            {
+              "id": "job_title",
+              "displayName": "job_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "companyLink",
+              "displayName": "companyLink",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rating",
+              "displayName": "rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reasoning",
+              "displayName": "reasoning",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "link",
+              "displayName": "link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "employmentType",
+              "displayName": "employmentType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1872,
+        80
+      ],
+      "id": "a099c914-2067-4bc3-b6da-f88fe2304d62",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "RAsnDxfXve6rzTvR",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Below is the candidate's resume:\n\n{{ $('Get resume').first().json.content }}\n\n-----------------------------------\n\nBelow is the job posting to evaluate:\n\n{\n  \"Job Title\": \"{{ $json.title }}\",\n  \"Company\": \"{{ $json.companyName }}\",\n  \"Location\": \"{{ $json.location }}\",\n  \"Description\": \"{{ $json.descriptionText }}\",\n  \"Employment Type\": \"{{ $json.employmentType }}\",\n  \"Company Description\": \"{{ $json.companyDescription }}\"\n}\n\nPlease evaluate this job posting against the resume and provide your assessment."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "instructions": "You are a helpful, intelligent job filtering assistant.\n\nYour task is to evaluate job postings against a candidate's resume and determine if they are a good fit.\n\nFor each job posting, evaluate based on these criteria:\n1. Required Skills: Check if the job requires skills that the candidate possesses\n2. Experience Level: Ensure the job's experience level matches the candidate's experience\n3. Location: Only consider remote jobs\n4. Job Description: The job should align with career goals (Full Stack Developer and Gen AI developer)",
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "name": "job_evaluation",
+              "schema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"job_title\": {\n      \"type\": \"string\"\n    },\n    \"company\": {\n      \"type\": \"string\"\n    },\n    \"companyLink\": {\n      \"type\": \"string\"\n    },\n    \"is_fit\": {\n      \"type\": \"string\",\n      \"enum\": [\"Yes\", \"No\"]\n    },\n    \"rating\": {\n      \"type\": \"string\"\n    },\n    \"reasoning\": {\n      \"type\": \"string\"\n    },\n    \"link\": {\n      \"type\": \"string\"\n    },\n    \"employmentType\": {\n      \"type\": \"string\"\n    },\n    \"applied\": {\n      \"type\": \"boolean\"\n    }\n  },\n  \"additionalProperties\": false,\n  \"required\": [\"job_title\", \"company\", \"companyLink\", \"is_fit\", \"rating\", \"reasoning\", \"link\", \"employmentType\", \"applied\"]\n}",
+              "description": "Job posting evaluation result",
+              "strict": true
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        624,
+        336
+      ],
+      "id": "98bfc76f-b44c-4b9c-a818-859b406de80c",
+      "name": "Job Fit Check Agent",
+      "credentials": {
+        "openAiApi": {
+          "id": "WnKpEAlRef7JXEVa",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the JSON output from the AI agent response\nconst input = $input.first().json.output[0].content[0].text;\nconst link = $('Loop Over Items').first().json.link;\n\nif (typeof input === \"string\") {\n  const inputJSON = JSON.parse(input);\n  return { ...inputJSON, link: link };\n}\n\nreturn { ...input, link: link };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        352
+      ],
+      "id": "9df10bd5-71fd-45c0-bfa1-6b72da7fe3a0",
+      "name": "Parse output",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "c883971f-9657-4490-91af-5653f6bfa86e",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        208,
+        192
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "documentId": {
+          "__rl": true,
+          "value": "1VMD_zawm6keYOTm0xHzMQa-4dGDyVo5gEE0TrxSlu4g",
+          "mode": "list",
+          "cachedResultName": "Job Search",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VMD_zawm6keYOTm0xHzMQa-4dGDyVo5gEE0TrxSlu4g/edit?usp=drivesdk"
+        },
+        "title": "={{ $json.isoDate }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -656,
+        192
+      ],
+      "id": "8117c460-e594-4c55-b02d-f8b88e95debc",
+      "name": "Create sheet",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "RAsnDxfXve6rzTvR",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const date = new Date();\n\n// Get the date in America/New_York timezone and format as ISO date (YYYY-MM-DD)\nconst formatter = new Intl.DateTimeFormat('en-CA', {\n  timeZone: 'America/New_York',\n  year: 'numeric',\n  month: '2-digit',\n  day: '2-digit',\n});\n\nconst isoDate = formatter.format(date);\nreturn { isoDate };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        192
+      ],
+      "id": "19bc3094-07e1-4d11-a219-f501465005f0",
+      "name": "Create Sheet Name"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.is_fit }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "id": "98395547-81cd-4f46-8d7f-470586e8c500"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a2384fc4-0b33-47e8-8581-df92cada388b",
+      "name": "Filter is_fit = true",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a job selection assistant. You will receive a list of job postings that have already been filtered as good fits. Your task is to analyze all the jobs and select the TOP 5 BEST opportunities based on:\n\n1) Highest rating scores\n2) Best alignment with Full Stack Developer and Gen AI developer roles\n3) Company reputation and growth potential\n4) Job description quality and clarity\n\nReturn ONLY the 5 best jobs from the list provided."
+        }
+      },
+      "id": "4f66f4a3-1e32-4af1-b1bb-12ca683e6f80",
+      "name": "Select Best 5 Jobs",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1248,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "15a12e4b-aa67-4ddf-8646-a2c4cc3dd763",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1200,
+        288
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "WnKpEAlRef7JXEVa",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\"type\": \"object\", \"properties\": {\"top_jobs\": {\"type\": \"array\", \"items\": {\"type\": \"object\", \"properties\": {\"job_title\": {\"type\": \"string\"}, \"company\": {\"type\": \"string\"}, \"companyLink\": {\"type\": \"string\"}, \"rating\": {\"type\": \"string\"}, \"reasoning\": {\"type\": \"string\"}, \"link\": {\"type\": \"string\"}, \"employmentType\": {\"type\": \"string\"}}, \"required\": [\"job_title\", \"company\", \"link\"]}, \"maxItems\": 5}}, \"required\": [\"top_jobs\"]}"
+      },
+      "id": "48aa27fb-d073-495e-a9e8-d7b9caffa01d",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1424,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "maxItems": 30
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "50c98f7b-38cc-4694-8b11-23ec290b1f17",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "8c35800b-f8e0-4db8-9efe-5096825e4f61",
+      "name": "Combine Filtered Items",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        864,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.first().json.output.top_jobs "
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1648,
+        80
+      ],
+      "id": "aaaa65e7-9695-44f4-91c4-2c1795f5f583",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-globals.globalConstants",
+      "typeVersion": 1,
+      "position": [
+        -1104,
+        192
+      ],
+      "id": "e736b558-193e-4566-b0a8-4c67cc923136",
+      "name": "Global Constants",
+      "credentials": {
+        "globalConstantsApi": {
+          "id": "GDTUfAiMJjNtd8jW",
+          "name": "Global Constants account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "Run actor and get dataset",
+        "actorId": {
+          "__rl": true,
+          "value": "hKByXkMQaC5Qt9UMN",
+          "mode": "list",
+          "cachedResultName": "Linkedin Jobs Scraper - PPR (curious_coder/linkedin-jobs-scraper)",
+          "cachedResultUrl": "https://console.apify.com/actors/hKByXkMQaC5Qt9UMN/input"
+        },
+        "customBody": "={\n    \"count\": 100,\n    \"scrapeCompany\": true,\n    \"urls\": [\n\"{{ $('Global Constants').item.json.constants.LINKEDIN_URL_CANADA }}\",\n\"{{ $('Global Constants').item.json.constants.LINKEDIN_URL_US }}\"]\n}",
+        "timeout": {}
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        272
+      ],
+      "id": "d86aad4c-d288-45b5-bbbe-67f401223fd2",
+      "name": "Run an Actor and get dataset1",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "retryOnFail": false,
+      "credentials": {
+        "apifyApi": {
+          "id": "bFWhLqLrVmduMF79",
+          "name": "Apify account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Global Constants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Fit Check Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse output": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Filter is_fit = true",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Job Fit Check Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get resume": {
+      "main": [
+        [
+          {
+            "node": "Run an Actor and get dataset1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create sheet": {
+      "main": [
+        [
+          {
+            "node": "Get resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Sheet Name": {
+      "main": [
+        [
+          {
+            "node": "Create sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter is_fit = true": {
+      "main": [
+        [
+          {
+            "node": "Combine Filtered Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Select Best 5 Jobs",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Select Best 5 Jobs",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Best 5 Jobs": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Filtered Items": {
+      "main": [
+        [
+          {
+            "node": "Select Best 5 Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Global Constants": {
+      "main": [
+        [
+          {
+            "node": "Create Sheet Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run an Actor and get dataset1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "rmDfCTWRzR57SKTP-X6hw"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "1b7487fb-42db-40aa-a299-7f3d0427b10e",
+  "activeVersionId": "1b7487fb-42db-40aa-a299-7f3d0427b10e",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-01-13T13:06:22.870Z",
+      "createdAt": "2026-01-13T13:06:22.870Z",
+      "role": "workflow:owner",
+      "workflowId": "E5ubM3iW16uck4BR3hhLB",
+      "projectId": "S9MAW5q8Q1rswQcB"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-01-14T12:01:53.000Z",
+    "createdAt": "2026-01-14T12:00:12.252Z",
+    "versionId": "1b7487fb-42db-40aa-a299-7f3d0427b10e",
+    "workflowId": "E5ubM3iW16uck4BR3hhLB",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "triggerAtHour": 17
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -1312,
+          192
+        ],
+        "id": "dc1c97ae-44a9-403d-a8e1-7fe16a16f7b5",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "documentURL": "1WsWH0_c3S3UtESpRbxiL1SgfI6WFIM_j4i88y_AFG8Y"
+        },
+        "type": "n8n-nodes-base.googleDocs",
+        "typeVersion": 2,
+        "position": [
+          -432,
+          192
+        ],
+        "id": "6ba4e8c7-0702-4bdc-b3e5-1cf1883eb3a0",
+        "name": "Get resume",
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "credentials": {
+          "googleDocsOAuth2Api": {
+            "id": "Xf0jjXdboN3IyTBx",
+            "name": "Google Docs account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "1VMD_zawm6keYOTm0xHzMQa-4dGDyVo5gEE0TrxSlu4g",
+            "mode": "list",
+            "cachedResultName": "Job Search",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VMD_zawm6keYOTm0xHzMQa-4dGDyVo5gEE0TrxSlu4g/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "={{ $('Create Sheet Name').item.json.isoDate }}",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [
+              "link"
+            ],
+            "schema": [
+              {
+                "id": "job_title",
+                "displayName": "job_title",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "company",
+                "displayName": "company",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "companyLink",
+                "displayName": "companyLink",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "rating",
+                "displayName": "rating",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "reasoning",
+                "displayName": "reasoning",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "link",
+                "displayName": "link",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "employmentType",
+                "displayName": "employmentType",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {
+            "cellFormat": "USER_ENTERED"
+          }
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1872,
+          80
+        ],
+        "id": "a099c914-2067-4bc3-b6da-f88fe2304d62",
+        "name": "Append or update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "RAsnDxfXve6rzTvR",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "gpt-5-mini",
+            "mode": "list",
+            "cachedResultName": "GPT-5-MINI"
+          },
+          "responses": {
+            "values": [
+              {
+                "content": "=Below is the candidate's resume:\n\n{{ $('Get resume').first().json.content }}\n\n-----------------------------------\n\nBelow is the job posting to evaluate:\n\n{\n  \"Job Title\": \"{{ $json.title }}\",\n  \"Company\": \"{{ $json.companyName }}\",\n  \"Location\": \"{{ $json.location }}\",\n  \"Description\": \"{{ $json.descriptionText }}\",\n  \"Employment Type\": \"{{ $json.employmentType }}\",\n  \"Company Description\": \"{{ $json.companyDescription }}\"\n}\n\nPlease evaluate this job posting against the resume and provide your assessment."
+              }
+            ]
+          },
+          "builtInTools": {},
+          "options": {
+            "instructions": "You are a helpful, intelligent job filtering assistant.\n\nYour task is to evaluate job postings against a candidate's resume and determine if they are a good fit.\n\nFor each job posting, evaluate based on these criteria:\n1. Required Skills: Check if the job requires skills that the candidate possesses\n2. Experience Level: Ensure the job's experience level matches the candidate's experience\n3. Location: Only consider remote jobs\n4. Job Description: The job should align with career goals (Full Stack Developer and Gen AI developer)",
+            "textFormat": {
+              "textOptions": {
+                "type": "json_schema",
+                "name": "job_evaluation",
+                "schema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"job_title\": {\n      \"type\": \"string\"\n    },\n    \"company\": {\n      \"type\": \"string\"\n    },\n    \"companyLink\": {\n      \"type\": \"string\"\n    },\n    \"is_fit\": {\n      \"type\": \"string\",\n      \"enum\": [\"Yes\", \"No\"]\n    },\n    \"rating\": {\n      \"type\": \"string\"\n    },\n    \"reasoning\": {\n      \"type\": \"string\"\n    },\n    \"link\": {\n      \"type\": \"string\"\n    },\n    \"employmentType\": {\n      \"type\": \"string\"\n    },\n    \"applied\": {\n      \"type\": \"boolean\"\n    }\n  },\n  \"additionalProperties\": false,\n  \"required\": [\"job_title\", \"company\", \"companyLink\", \"is_fit\", \"rating\", \"reasoning\", \"link\", \"employmentType\", \"applied\"]\n}",
+                "description": "Job posting evaluation result",
+                "strict": true
+              }
+            }
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 2.1,
+        "position": [
+          624,
+          336
+        ],
+        "id": "98bfc76f-b44c-4b9c-a818-859b406de80c",
+        "name": "Job Fit Check Agent",
+        "credentials": {
+          "openAiApi": {
+            "id": "WnKpEAlRef7JXEVa",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Parse the JSON output from the AI agent response\nconst input = $input.first().json.output[0].content[0].text;\nconst link = $('Loop Over Items').first().json.link;\n\nif (typeof input === \"string\") {\n  const inputJSON = JSON.parse(input);\n  return { ...inputJSON, link: link };\n}\n\nreturn { ...input, link: link };"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          912,
+          352
+        ],
+        "id": "9df10bd5-71fd-45c0-bfa1-6b72da7fe3a0",
+        "name": "Parse output",
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "options": {
+            "reset": false
+          }
+        },
+        "id": "c883971f-9657-4490-91af-5653f6bfa86e",
+        "name": "Loop Over Items",
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          208,
+          192
+        ],
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "operation": "create",
+          "documentId": {
+            "__rl": true,
+            "value": "1VMD_zawm6keYOTm0xHzMQa-4dGDyVo5gEE0TrxSlu4g",
+            "mode": "list",
+            "cachedResultName": "Job Search",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VMD_zawm6keYOTm0xHzMQa-4dGDyVo5gEE0TrxSlu4g/edit?usp=drivesdk"
+          },
+          "title": "={{ $json.isoDate }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -656,
+          192
+        ],
+        "id": "8117c460-e594-4c55-b02d-f8b88e95debc",
+        "name": "Create sheet",
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "RAsnDxfXve6rzTvR",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const date = new Date();\n\n// Get the date in America/New_York timezone and format as ISO date (YYYY-MM-DD)\nconst formatter = new Intl.DateTimeFormat('en-CA', {\n  timeZone: 'America/New_York',\n  year: 'numeric',\n  month: '2-digit',\n  day: '2-digit',\n});\n\nconst isoDate = formatter.format(date);\nreturn { isoDate };"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -880,
+          192
+        ],
+        "id": "19bc3094-07e1-4d11-a219-f501465005f0",
+        "name": "Create Sheet Name"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ $json.is_fit }}",
+                "rightValue": "Yes",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                },
+                "id": "98395547-81cd-4f46-8d7f-470586e8c500"
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "a2384fc4-0b33-47e8-8581-df92cada388b",
+        "name": "Filter is_fit = true",
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "position": [
+          624,
+          80
+        ]
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.data }}",
+          "hasOutputParser": true,
+          "options": {
+            "systemMessage": "You are a job selection assistant. You will receive a list of job postings that have already been filtered as good fits. Your task is to analyze all the jobs and select the TOP 5 BEST opportunities based on:\n\n1) Highest rating scores\n2) Best alignment with Full Stack Developer and Gen AI developer roles\n3) Company reputation and growth potential\n4) Job description quality and clarity\n\nReturn ONLY the 5 best jobs from the list provided."
+          }
+        },
+        "id": "4f66f4a3-1e32-4af1-b1bb-12ca683e6f80",
+        "name": "Select Best 5 Jobs",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          1248,
+          80
+        ]
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "gpt-5-mini",
+            "mode": "list",
+            "cachedResultName": "gpt-5-mini"
+          },
+          "builtInTools": {},
+          "options": {}
+        },
+        "id": "15a12e4b-aa67-4ddf-8646-a2c4cc3dd763",
+        "name": "OpenAI Chat Model",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.3,
+        "position": [
+          1200,
+          288
+        ],
+        "credentials": {
+          "openAiApi": {
+            "id": "WnKpEAlRef7JXEVa",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "schemaType": "manual",
+          "inputSchema": "{\"type\": \"object\", \"properties\": {\"top_jobs\": {\"type\": \"array\", \"items\": {\"type\": \"object\", \"properties\": {\"job_title\": {\"type\": \"string\"}, \"company\": {\"type\": \"string\"}, \"companyLink\": {\"type\": \"string\"}, \"rating\": {\"type\": \"string\"}, \"reasoning\": {\"type\": \"string\"}, \"link\": {\"type\": \"string\"}, \"employmentType\": {\"type\": \"string\"}}, \"required\": [\"job_title\", \"company\", \"link\"]}, \"maxItems\": 5}}, \"required\": [\"top_jobs\"]}"
+        },
+        "id": "48aa27fb-d073-495e-a9e8-d7b9caffa01d",
+        "name": "Structured Output Parser",
+        "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+        "typeVersion": 1.3,
+        "position": [
+          1424,
+          272
+        ]
+      },
+      {
+        "parameters": {
+          "maxItems": 30
+        },
+        "type": "n8n-nodes-base.limit",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "50c98f7b-38cc-4694-8b11-23ec290b1f17",
+        "name": "Limit"
+      },
+      {
+        "parameters": {
+          "aggregate": "aggregateAllItemData",
+          "options": {}
+        },
+        "id": "8c35800b-f8e0-4db8-9efe-5096825e4f61",
+        "name": "Combine Filtered Items",
+        "type": "n8n-nodes-base.aggregate",
+        "typeVersion": 1,
+        "position": [
+          864,
+          80
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "return $input.first().json.output.top_jobs "
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1648,
+          80
+        ],
+        "id": "aaaa65e7-9695-44f4-91c4-2c1795f5f583",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-globals.globalConstants",
+        "typeVersion": 1,
+        "position": [
+          -1104,
+          192
+        ],
+        "id": "e736b558-193e-4566-b0a8-4c67cc923136",
+        "name": "Global Constants",
+        "credentials": {
+          "globalConstantsApi": {
+            "id": "GDTUfAiMJjNtd8jW",
+            "name": "Global Constants account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "Run actor and get dataset",
+          "actorId": {
+            "__rl": true,
+            "value": "hKByXkMQaC5Qt9UMN",
+            "mode": "list",
+            "cachedResultName": "Linkedin Jobs Scraper - PPR (curious_coder/linkedin-jobs-scraper)",
+            "cachedResultUrl": "https://console.apify.com/actors/hKByXkMQaC5Qt9UMN/input"
+          },
+          "customBody": "={\n    \"count\": 100,\n    \"scrapeCompany\": true,\n    \"urls\": [\n\"{{ $('Global Constants').item.json.constants.LINKEDIN_URL_CANADA }}\",\n\"{{ $('Global Constants').item.json.constants.LINKEDIN_URL_US }}\"]\n}",
+          "timeout": {}
+        },
+        "type": "@apify/n8n-nodes-apify.apify",
+        "typeVersion": 1,
+        "position": [
+          -160,
+          272
+        ],
+        "id": "d86aad4c-d288-45b5-bbbe-67f401223fd2",
+        "name": "Run an Actor and get dataset1",
+        "alwaysOutputData": false,
+        "executeOnce": false,
+        "retryOnFail": false,
+        "credentials": {
+          "apifyApi": {
+            "id": "bFWhLqLrVmduMF79",
+            "name": "Apify account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Global Constants",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Job Fit Check Agent": {
+        "main": [
+          [
+            {
+              "node": "Parse output",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse output": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Over Items": {
+        "main": [
+          [
+            {
+              "node": "Filter is_fit = true",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Job Fit Check Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get resume": {
+        "main": [
+          [
+            {
+              "node": "Run an Actor and get dataset1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create sheet": {
+        "main": [
+          [
+            {
+              "node": "Get resume",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Sheet Name": {
+        "main": [
+          [
+            {
+              "node": "Create sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter is_fit = true": {
+        "main": [
+          [
+            {
+              "node": "Combine Filtered Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Select Best 5 Jobs",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Structured Output Parser": {
+        "ai_outputParser": [
+          [
+            {
+              "node": "Select Best 5 Jobs",
+              "type": "ai_outputParser",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Select Best 5 Jobs": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Combine Filtered Items": {
+        "main": [
+          [
+            {
+              "node": "Select Best 5 Jobs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Append or update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Global Constants": {
+        "main": [
+          [
+            {
+              "node": "Create Sheet Name",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Run an Actor and get dataset1": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Rishabh Saha",
+    "name": "Version 1b7487fb",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
