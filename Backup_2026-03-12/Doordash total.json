@@ -1,0 +1,624 @@
+{
+  "updatedAt": "2026-01-18T00:33:43.268Z",
+  "createdAt": "2026-01-18T00:32:58.953Z",
+  "id": "2mjynISqOECOoxP_sIGNJ",
+  "name": "Doordash total",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "simple": false,
+        "filters": {
+          "q": "from: no-reply@doordash.com \"Order Confirmation\"",
+          "receivedAfter": "={{ $today.startOf('month') }}",
+          "receivedBefore": "={{ $today.plus(1 'days') }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        128
+      ],
+      "id": "c3c41cdd-0dc5-4abb-b497-84732a38096a",
+      "name": "Get many messages",
+      "webhookId": "[REDACTED]",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7B2miiaxJtZ15XOX",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Method 3: Simple and direct approach\nfunction extractTotal(html) {\n  const match = html.match(/Total:\\s*CA\\$(\\d+\\.\\d+)/);\n  if (match) {\n    return Math.round(parseFloat(match[1]) * 100); // Returns 2258 (cents)\n  }\n  return null;\n}\n\n// Usage example:\nconst htmlContent = $input.first().json.html;\nconst totalInCents = extractTotal(htmlContent);\nif (totalInCents) {\n  return { Total: Number((totalInCents / 100).toFixed(2)) };\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        256
+      ],
+      "id": "0cdfa144-80b1-41bf-bc00-2f2309263c0b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "sum",
+              "field": "Total"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        864,
+        112
+      ],
+      "id": "7aa80beb-e976-4f55-9373-e91722c24e6f",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        624,
+        128
+      ],
+      "id": "656c4a9d-367c-48a3-8612-6aa5626ef6df",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtDayOfMonth": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8e4519a1-d6bd-402f-8289-eb62655b1787",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {
+          "chatIds": "-1003623723393"
+        }
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        288
+      ],
+      "id": "9bc4b5d1-68e9-4dbf-8f01-a3eb507384c6",
+      "name": "Telegram Trigger",
+      "webhookId": "[REDACTED]",
+      "credentials": {
+        "telegramApi": {
+          "id": "aGXHchKpNa6jesHn",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2fbbc06e-1ae6-4859-be69-8324850d0b6a",
+              "leftValue": "={{ $json.message.from.first_name }}",
+              "rightValue": "Rishabh",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "e58ef917-a50c-4eed-9ab4-1ab2d238d32a",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/doordash",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        176,
+        288
+      ],
+      "id": "da9c5310-7c5d-4337-9626-9bd3e5343805",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "yYmaqYw2mLcEEmbm",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/yYmaqYw2mLcEEmbm",
+          "cachedResultName": "Telegram subworkflow message"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "text": "=Your doodash total for the month is  {{ $json.sum_Total }}"
+          },
+          "matchingColumns": [
+            "text"
+          ],
+          "schema": [
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1104,
+        160
+      ],
+      "id": "744c52af-abfe-4372-979c-0343361bc89f",
+      "name": "Call 'Telegram subworkflow message'"
+    }
+  ],
+  "connections": {
+    "Get many messages": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Call 'Telegram subworkflow message'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get many messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get many messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "8647ffbb-e8dc-4bee-8b5b-ceb0471d742f",
+  "activeVersionId": "8647ffbb-e8dc-4bee-8b5b-ceb0471d742f",
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2026-01-18T00:32:58.954Z",
+      "createdAt": "2026-01-18T00:32:58.954Z",
+      "role": "workflow:owner",
+      "workflowId": "2mjynISqOECOoxP_sIGNJ",
+      "projectId": "S9MAW5q8Q1rswQcB"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-01-18T00:33:47.000Z",
+    "createdAt": "2026-01-18T00:33:43.268Z",
+    "versionId": "8647ffbb-e8dc-4bee-8b5b-ceb0471d742f",
+    "workflowId": "2mjynISqOECOoxP_sIGNJ",
+    "nodes": [
+      {
+        "parameters": {
+          "operation": "getAll",
+          "simple": false,
+          "filters": {
+            "q": "from: no-reply@doordash.com \"Order Confirmation\"",
+            "receivedAfter": "={{ $today.startOf('month') }}",
+            "receivedBefore": "={{ $today.plus(1 'days') }}"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          416,
+          128
+        ],
+        "id": "c3c41cdd-0dc5-4abb-b497-84732a38096a",
+        "name": "Get many messages",
+        "webhookId": "[REDACTED]",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "7B2miiaxJtZ15XOX",
+            "name": "Gmail account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Method 3: Simple and direct approach\nfunction extractTotal(html) {\n  const match = html.match(/Total:\\s*CA\\$(\\d+\\.\\d+)/);\n  if (match) {\n    return Math.round(parseFloat(match[1]) * 100); // Returns 2258 (cents)\n  }\n  return null;\n}\n\n// Usage example:\nconst htmlContent = $input.first().json.html;\nconst totalInCents = extractTotal(htmlContent);\nif (totalInCents) {\n  return { Total: Number((totalInCents / 100).toFixed(2)) };\n}\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          832,
+          256
+        ],
+        "id": "0cdfa144-80b1-41bf-bc00-2f2309263c0b",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "fieldsToSummarize": {
+            "values": [
+              {
+                "aggregation": "sum",
+                "field": "Total"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.summarize",
+        "typeVersion": 1.1,
+        "position": [
+          864,
+          112
+        ],
+        "id": "7aa80beb-e976-4f55-9373-e91722c24e6f",
+        "name": "Summarize"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          624,
+          128
+        ],
+        "id": "656c4a9d-367c-48a3-8612-6aa5626ef6df",
+        "name": "Loop Over Items"
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "months",
+                "triggerAtDayOfMonth": 30
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          0,
+          0
+        ],
+        "id": "8e4519a1-d6bd-402f-8289-eb62655b1787",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "updates": [
+            "message"
+          ],
+          "additionalFields": {
+            "chatIds": "-1003623723393"
+          }
+        },
+        "type": "n8n-nodes-base.telegramTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          16,
+          288
+        ],
+        "id": "9bc4b5d1-68e9-4dbf-8f01-a3eb507384c6",
+        "name": "Telegram Trigger",
+        "webhookId": "[REDACTED]",
+        "credentials": {
+          "telegramApi": {
+            "id": "aGXHchKpNa6jesHn",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "2fbbc06e-1ae6-4859-be69-8324850d0b6a",
+                "leftValue": "={{ $json.message.from.first_name }}",
+                "rightValue": "Rishabh",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              },
+              {
+                "id": "e58ef917-a50c-4eed-9ab4-1ab2d238d32a",
+                "leftValue": "={{ $json.message.text }}",
+                "rightValue": "/doordash",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          176,
+          288
+        ],
+        "id": "da9c5310-7c5d-4337-9626-9bd3e5343805",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "yYmaqYw2mLcEEmbm",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/yYmaqYw2mLcEEmbm",
+            "cachedResultName": "Telegram subworkflow message"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "text": "=Your doodash total for the month is  {{ $json.sum_Total }}"
+            },
+            "matchingColumns": [
+              "text"
+            ],
+            "schema": [
+              {
+                "id": "text",
+                "displayName": "text",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          1104,
+          160
+        ],
+        "id": "744c52af-abfe-4372-979c-0343361bc89f",
+        "name": "Call 'Telegram subworkflow message'"
+      }
+    ],
+    "connections": {
+      "Get many messages": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Over Items": {
+        "main": [
+          [
+            {
+              "node": "Summarize",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Summarize": {
+        "main": [
+          [
+            {
+              "node": "Call 'Telegram subworkflow message'",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get many messages",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Telegram Trigger": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Get many messages",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Rishabh Saha",
+    "name": "Version 8647ffbb",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
